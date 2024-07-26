@@ -41,7 +41,15 @@ const Login = () => {
         >
           Login
         </button>
-        {isLoginAttempt ? auth ? <h1>Sucessful</h1> : <h1>Fail</h1> : <h1></h1>}
+        {isLoginAttempt ? (
+          auth ? (
+            <h1>Sucessfull</h1>
+          ) : (
+            <h1>Fail</h1>
+          )
+        ) : (
+          <h1></h1>
+        )}
         <hr className="w-full opacity-50" />
       </div>
     </div>
