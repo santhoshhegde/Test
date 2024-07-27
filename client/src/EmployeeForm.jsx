@@ -33,9 +33,19 @@ const EmployeeForm = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form Data:", formData);
+    // console.log("Form Data:", formData);
+
+    const data = await fetch("http://localhost:3001/createUser", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+    const json = await data.json();
+    console.log(json);
   };
 
   return (

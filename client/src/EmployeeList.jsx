@@ -1,51 +1,61 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 const EmployeeList = () => {
-  const [data, setData] = useState([
-    {
-      id: 1,
-      image: "https://via.placeholder.com/40",
-      name: "Santhosh",
-      email: "Santhosh@gmail.com",
-      mobile: "9141567408",
-      designation: "Software Developer",
-      gender: "Male",
-      course: "B.E",
-      createDate: "26-07-2024",
-    },
-    {
-      id: 1,
-      name: "John Doe",
-      email: "john@example.com",
-      mobile: "123-456-7890",
-      designation: "Software Engineer",
-      gender: "Male",
-      course: "Computer Science",
-      createDate: "2022-01-01",
-    },
-  ]);
-  const [filter, setFilter] = useState(data);
-  const [search, setSearch] = useState("");
+  const [data, setData] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredData, setFilteredData] = useState([]);
 
-  const handleSearch = () => {
-    const filtered = data.filter((item) =>
-      item.name.toLowerCase().includes(search)
-    );
-    setFilter(filtered);
+  useEffect(() => {
+    getData();
+  }, []);
+
+  const getData = async () => {
+    const data = await fetch("http://localhost:3001/employeeList");
+    const response = await data.json();
+    setData(response);
+    setFilteredData(response);
+    // console.log(response);
   };
+
+  const handleSearch = (event) => {
+    const term = event.target.value;
+    setSearchTerm(term);
+    if (term) {
+      const filtered = data.filter((item) =>
+        Object.values(item).some((value) =>
+          value.toString().toLowerCase().includes(term.toLowerCase())
+        )
+      );
+      setFilteredData(filtered);
+    } else {
+      setFilteredData(data);
+    }
+  };
+  const handleDelete = async (id) => {
+    const response = await fetch("http://localhost:3001/deleteUser/" + id, {
+      method: "delete",
+    });
+    const data = await response.json();
+    window.location.reload();
+  };
+
+  if (filteredData.length == 0) return <h1>No data</h1>;
   return (
     <div>
       <header className="flex justify-between bg-blue-400 p-5">
         <h2>Home</h2>
         <h2>Employee List</h2>
-        <h2>Santhosh</h2>
-        <button>Logout</button>
+        <h2>{localStorage.getItem("Name")}</h2>
+        <Link to="/login">Logout</Link>
       </header>
 
       <div className="flex justify-between bg-yellow-400 p-5">
         <h3>Employee List</h3>
         <h3>Total count {data.length}</h3>
-        <h3>Create Employee</h3>
+        <Link to="/create-employee">
+          <h3>Create Employee</h3>
+        </Link>
       </div>
 
       <div className="flex justify-end bg-gray-200 p-2">
@@ -57,10 +67,9 @@ const EmployeeList = () => {
           placeholder="Search"
           id="search"
           className="p-1 w-80"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          value={searchTerm}
+          onChange={handleSearch}
         />
-        <button onClick={handleSearch}>Search</button>
       </div>
 
       <main>
@@ -81,9 +90,9 @@ const EmployeeList = () => {
               </tr>
             </thead>
             <tbody>
-              {filter.map((item, index) => (
+              {filteredData.map((item, index) => (
                 <tr key={index} className="hover:bg-gray-50">
-                  <td className="py-2 px-4 border-b text-center">{item.id}</td>
+                  <td className="py-2 px-4 border-b text-center">{item._id}</td>
                   <td className="py-2 px-4 border-b text-center">
                     {item.image}
                   </td>
@@ -103,7 +112,7 @@ const EmployeeList = () => {
                     {item.gender}
                   </td>
                   <td className="py-2 px-4 border-b text-center">
-                    {item.course}
+                    {item.courses.join(", ")}
                   </td>
                   <td className="py-2 px-4 border-b text-center">
                     {item.createDate}
@@ -112,7 +121,10 @@ const EmployeeList = () => {
                     <button className="text-blue-500 hover:text-blue-700">
                       Edit
                     </button>
-                    <button className="text-red-500 hover:text-red-700 ml-2">
+                    <button
+                      className="text-red-500 hover:text-red-700 ml-2"
+                      onClick={() => handleDelete(item._id)}
+                    >
                       Delete
                     </button>
                   </td>
