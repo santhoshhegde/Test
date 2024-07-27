@@ -1,15 +1,18 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const [auth, setAuth] = useState();
   const [isLoginAttempt, setIsLoginAttempt] = useState(false);
+  const navigate = useNavigate();
   const authentication = () => {
     if (login === "santhosh" && password === "12345") {
-      setAuth(true);
+      navigate("/dashboard");
+      localStorage.setItem("Name", "USERNAME");
     } else {
-      setAuth(false);
+      alert("Login Failed");
     }
     setIsLoginAttempt(true);
   };
