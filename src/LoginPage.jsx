@@ -10,6 +10,7 @@ const Login = () => {
   const authentication = () => {
     if (login === "santhosh" && password === "12345") {
       navigate("/dashboard");
+      localStorage.setItem("Name", "USERNAME");
     } else {
       alert("Login Failed");
     }

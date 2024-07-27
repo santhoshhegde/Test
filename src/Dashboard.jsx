@@ -11,7 +11,7 @@ const Dashboard = () => {
         <h2>
           <Link to="/employee-list">Employee List</Link>
         </h2>
-        <h2>Name</h2>
+        <h2>{localStorage.getItem("Name")}</h2>
         <h2>
           <Link to="/login">Logout</Link>
         </h2>
