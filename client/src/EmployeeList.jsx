@@ -15,7 +15,7 @@ const EmployeeList = () => {
     const response = await data.json();
     setData(response);
     setFilteredData(response);
-    // console.log(response);
+    console.log(response);
   };
 
   const handleSearch = (event) => {

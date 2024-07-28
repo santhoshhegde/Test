@@ -57,18 +57,26 @@ const Edit = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // console.log("Form Data:", formData);
 
-    const data = await fetch("http://localhost:3001/updateUser/" + id, {
+    const data = new FormData();
+    data.append("name", formData.name);
+    data.append("email", formData.email);
+    data.append("mobile", formData.mobile);
+    data.append("designation", formData.designation);
+    data.append("gender", formData.gender);
+    data.append("courses", JSON.stringify(formData.courses)); // Convert array to string
+    if (formData.image) {
+      data.append("image", formData.image);
+    }
+
+    const response = await fetch("http://localhost:3001/updateUser/" + id, {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
+      body: data,
     });
-    const json = await data.json();
+
+    const json = await response.json();
     navigate("/employee-list");
-    // console.log(json);
+    console.log(json);
   };
 
   return (

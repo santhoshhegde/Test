@@ -8,7 +8,7 @@ const Login = () => {
   const [isLoginAttempt, setIsLoginAttempt] = useState(false);
   const navigate = useNavigate();
   const authentication = () => {
-    if (login === "santhosh" && password === "12345") {
+    if (login === "admin" && password === "12345") {
       navigate("/dashboard");
       localStorage.setItem("Name", "USERNAME");
     } else {

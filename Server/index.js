@@ -8,6 +8,7 @@ const path = require("path");
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(express.static("uploads"));
 
 mongoose.connect("mongodb://127.0.0.1:27017/TestCRUD");
 
@@ -47,15 +48,31 @@ const upload = multer({ storage: storage, fileFilter: fileFilter });
 // });
 
 app.post("/createUser", upload.single("image"), async (req, res) => {
-  const existingUser = await UserModel.findOne({ email: req.body.email });
+  try {
+    const existingUser = await UserModel.findOne({ email: req.body.email });
 
-  if (existingUser) {
-    // Email already exists, return an error response
-    return res.status(400).json({ message: "Email already exists" });
+    if (existingUser) {
+      // Email already exists, return an error response
+      return res.status(400).json({ message: "Email already exists" });
+    }
+
+    // Convert courses from string back to array
+    const coursesArray = JSON.parse(req.body.courses);
+
+    const newUser = new UserModel({
+      name: req.body.name,
+      email: req.body.email,
+      mobile: req.body.mobile,
+      designation: req.body.designation,
+      gender: req.body.gender,
+      courses: coursesArray,
+      image: req.file ? req.file.filename : null,
+    });
+    const savedUser = await newUser.save();
+    res.json(savedUser);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
-  UserModel.create(req.body)
-    .then((users) => res.json(users))
-    .catch((err) => res.json(err));
 });
 
 app.get("/employeeList", (req, res) => {
@@ -78,22 +95,34 @@ app.get("/getUser/:id", (req, res) => {
     .catch((err) => res.json(err));
 });
 
-app.put("/updateUser/:id", (req, res) => {
-  const id = req.params.id;
-  UserModel.findOneAndUpdate(
-    { _id: id },
-    {
+app.put("/updateUser/:id", upload.single("image"), async (req, res) => {
+  try {
+    const id = req.params.id;
+    const coursesArray = JSON.parse(req.body.courses);
+
+    const updatedData = {
       name: req.body.name,
       email: req.body.email,
       mobile: req.body.mobile,
       designation: req.body.designation,
       gender: req.body.gender,
-      courses: req.body.courses,
-      image: req.body.image,
+      courses: coursesArray,
+    };
+
+    if (req.file) {
+      updatedData.image = req.file.filename;
     }
-  )
-    .then((users) => res.json(users))
-    .catch((err) => res.json(err));
+
+    const updatedUser = await UserModel.findOneAndUpdate(
+      { _id: id },
+      updatedData,
+      { new: true }
+    );
+
+    res.json(updatedUser);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
 
 app.listen(3001, () => {
