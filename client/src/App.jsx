@@ -9,6 +9,7 @@ import Login from "./LoginPage";
 import Dashboard from "./Dashboard";
 import EmployeeList from "./EmployeeList";
 import EmployeeForm from "./EmployeeForm";
+import Edit from "./Edit";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path="*" element={<Navigate to="/login" replace />} />
           <Route path="/create-employee" element={<EmployeeForm />} />
           <Route path="/employee-list" element={<EmployeeList />} />
+          <Route path="/update/:id" element={<Edit />} />
         </Routes>
       </Router>
     </>

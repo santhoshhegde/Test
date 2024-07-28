@@ -23,8 +23,11 @@ const EmployeeList = () => {
     setSearchTerm(term);
     if (term) {
       const filtered = data.filter((item) =>
-        Object.values(item).some((value) =>
-          value.toString().toLowerCase().includes(term.toLowerCase())
+        Object.values(item).some(
+          (value) =>
+            value !== null &&
+            value !== undefined &&
+            value.toString().toLowerCase().includes(term.toLowerCase())
         )
       );
       setFilteredData(filtered);
@@ -40,7 +43,7 @@ const EmployeeList = () => {
     window.location.reload();
   };
 
-  if (filteredData.length == 0) return <h1>No data</h1>;
+  // if (filteredData.length == 0) return <h1>No data</h1>;
   return (
     <div>
       <header className="flex justify-between bg-blue-400 p-5">
@@ -92,9 +95,21 @@ const EmployeeList = () => {
             <tbody>
               {filteredData.map((item, index) => (
                 <tr key={index} className="hover:bg-gray-50">
-                  <td className="py-2 px-4 border-b text-center">{item._id}</td>
                   <td className="py-2 px-4 border-b text-center">
-                    {item.image}
+                    {index + 1}
+                  </td>
+                  <td className="py-2 px-4 border-b text-center">
+                    {item.image && (
+                      <img
+                        src={`http://localhost:3001/${item.image}`}
+                        alt={item.name}
+                        style={{
+                          width: "50px",
+                          height: "50px",
+                          objectFit: "cover",
+                        }}
+                      />
+                    )}
                   </td>
                   <td className="py-2 px-4 border-b text-center">
                     {item.name}
@@ -115,12 +130,15 @@ const EmployeeList = () => {
                     {item.courses.join(", ")}
                   </td>
                   <td className="py-2 px-4 border-b text-center">
-                    {item.createDate}
+                    {item.createdAt.slice(0, 10)}
                   </td>
                   <td className="py-2 px-4 border-b border-gray-300 text-center">
-                    <button className="text-blue-500 hover:text-blue-700">
+                    <Link
+                      to={`/update/${item._id}`}
+                      className="text-blue-500 hover:text-blue-700"
+                    >
                       Edit
-                    </button>
+                    </Link>
                     <button
                       className="text-red-500 hover:text-red-700 ml-2"
                       onClick={() => handleDelete(item._id)}

@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const EmployeeForm = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -23,6 +25,7 @@ const EmployeeForm = () => {
       }));
     } else if (type === "file") {
       const file = files[0];
+      console.log(file);
       if (file && (file.type === "image/jpeg" || file.type === "image/png")) {
         setFormData((prevData) => ({ ...prevData, image: file }));
       } else {
@@ -35,17 +38,30 @@ const EmployeeForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // console.log("Form Data:", formData);
 
-    const data = await fetch("http://localhost:3001/createUser", {
+    const data = new FormData();
+    data.append("name", formData.name);
+    data.append("email", formData.email);
+    data.append("mobile", formData.mobile);
+    data.append("designation", formData.designation);
+    data.append("gender", formData.gender);
+    data.append("courses", JSON.stringify(formData.courses)); // Convert array to string
+    if (formData.image) {
+      data.append("image", formData.image);
+    }
+
+    const response = await fetch("http://localhost:3001/createUser", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
+      body: data,
     });
-    const json = await data.json();
-    console.log(json);
+
+    if (response.status === 400) {
+      alert("User already exists");
+    } else {
+      const json = await response.json();
+      navigate("/employee-list");
+      console.log(json);
+    }
   };
 
   return (
